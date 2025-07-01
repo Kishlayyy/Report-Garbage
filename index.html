@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Garbage Report</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f6f8;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 50px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+
+      label {
+        font-weight: bold;
+        display: block;
+        margin-top: 15px;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+      }
+
+      #map {
+        height: 300px;
+        width: 100%;
+        margin-top: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+      }
+
+      button {
+        margin-top: 20px;
+        width: 100%;
+        padding: 12px;
+        background-color: #28a745;
+        color: white;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #218838;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Report Garbage Dump</h1>
+      <form action="/report" method="POST" enctype="multipart/form-data">
+        <label for="name">Your Name:</label>
+        <input type="text" name="name" id="name" required />
+
+        <label for="description">Description:</label>
+        <textarea name="description" rows="4" required></textarea>
+
+        <label for="image">Upload Image:</label>
+        <input type="file" name="image" />
+        <label for="image">Upload Image:</label>
+        <input type="file" name="image" />
+
+        <!-- Image preview here -->
+        <img
+          id="preview"
+          style="margin-top: 10px; max-width: 100%; display: none"
+        />
+        <label for="wasteType">Type of Waste:</label>
+        <select name="wasteType" id="wasteType" required>
+          <option value="">-- Select Type --</option>
+          <option value="Plastic Waste">Plastic Waste</option>
+          <option value="Organic Waste">Organic Waste</option>
+          <option value="Electronic Waste">Electronic Waste</option>
+          <option value="Medical Waste">Medical Waste</option>
+          <option value="Construction Debris">Construction Debris</option>
+          <option value="Other">Other</option>
+        </select>
+        <label for="map">Click on Map to Select Location:</label>
+        <div id="map"></div>
+
+        <input type="hidden" name="lat" id="lat" />
+        <input type="hidden" name="lng" id="lng" />
+
+        <button type="submit">Submit Report</button>
+      </form>
+    </div>
+    <p style="text-align: center; margin-top: 20px">
+      <a
+        style="color: #28a745; font-weight: bold; text-decoration: none"
+        href="/near.html"
+      >
+        📍 View Nearby Dumping Sites
+      </a>
+    </p>
+
+    <script>
+      let map;
+      let marker;
+
+      function initMap() {
+        const defaultLocation = { lat: 28.6139, lng: 77.209 }; // Delhi by default
+
+        map = new google.maps.Map(document.getElementById("map"), {
+          center: defaultLocation,
+          zoom: 12,
+        });
+
+        map.addListener("click", (e) => {
+          const clickedLocation = e.latLng;
+
+          // Place or move marker
+          if (marker) {
+            marker.setPosition(clickedLocation);
+          } else {
+            marker = new google.maps.Marker({
+              position: clickedLocation,
+              map: map,
+            });
+          }
+
+          // Set hidden form values
+          document.getElementById("lat").value = clickedLocation.lat();
+          document.getElementById("lng").value = clickedLocation.lng();
+        });
+      }
+    </script>
+
+    <!-- Replace YOUR_API_KEY_HERE -->
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkNu48h8SWNkbOJh2SbbUVNRy9_loiMho&callback=initMap"
+      async
+      defer
+    ></script>
+    <script>
+      document
+        .querySelector('input[type="file"]')
+        .addEventListener("change", function (e) {
+          const file = e.target.files[0];
+          const preview = document.getElementById("preview");
+          if (file) {
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = "block";
+          } else {
+            preview.style.display = "none";
+          }
+        });
+    </script>
+  </body>
+</html>
